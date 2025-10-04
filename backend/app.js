@@ -25,7 +25,9 @@ app.use(auth);
 // Rutas protegidas
 app.get('/users/me', getCurrentUser);
 
-mongoose.connect('mongodb://127.0.0.1:27017/aroundb19')
+// Conexión a Mongo
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/aroundb19';
+mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB conectado');
     app.listen(PORT, () => {
@@ -36,6 +38,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/aroundb19')
     console.error('❌ Error conectando a MongoDB:', err.message);
     process.exit(1);
   });
+
 
 app.use(errorLogger);
 app.use(errors());
