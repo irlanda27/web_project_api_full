@@ -5,16 +5,14 @@ const SALT_ROUNDS = 10;
 
 module.exports.createUser = async (req, res, next) => {
   try {
-    const { name, about, avatar, email, password } = req.body;
+    const {email, password } = req.body;
 
     // hash de la contraseña
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
 
     // crea usuario (si name/about/avatar vienen vacíos se aplican defaults del schema)
     const user = await User.create({
-      name,
-      about,
-      avatar,
+  
       email,
       password: hash,
     });
@@ -22,20 +20,18 @@ module.exports.createUser = async (req, res, next) => {
     // respondemos sin incluir password
     return res.status(201).send({
       _id: user._id,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
       email: user.email,
     });
   } catch (err) {
-    if (err.code === 11000) {
-      return res.status(409).send({ message: 'El email ya está registrado.' });
-    }
-    if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Datos de usuario inválidos.' });
-    }
-    return next ? next(err) : res.status(500).send({ message: 'Error del servidor.' });
+  if (err.code === 11000) {
+    err.statusCode = 409;
+    err.message = 'El email ya está registrado.';
+  } else if (err.name === 'ValidationError') {
+    err.statusCode = 400;
+    err.message = 'Datos de usuario inválidos.';
   }
+  return next(err);
+}
 };
 
 const jwt = require('jsonwebtoken');
@@ -64,8 +60,8 @@ module.exports.login = async (req, res, next) => {
 
     return res.send({ token }); // Enviar token en el cuerpo de la respuesta
   } catch (err) {
-    return next ? next(err) : res.status(500).send({ message: 'Error del servidor.' });
-  }
+  return next(err);
+}
 };
 module.exports.getCurrentUser = async (req, res, next) => {
   try {
