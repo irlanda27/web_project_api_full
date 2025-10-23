@@ -1,68 +1,24 @@
-const bcrypt = require('bcryptjs');
-const User = require('../models/user');
 
-const SALT_ROUNDS = 10;
-
-module.exports.createUser = async (req, res, next) => {
+module.exports.getUserById = async (req, res) => {
   try {
-    const {email, password } = req.body;
-
-    // hash de la contraseña
-    const hash = await bcrypt.hash(password, SALT_ROUNDS);
-
-    // crea usuario (si name/about/avatar vienen vacíos se aplican defaults del schema)
-    const user = await User.create({
-  
-      email,
-      password: hash,
-    });
-
-    // respondemos sin incluir password
-    return res.status(201).send({
-      _id: user._id,
-      email: user.email,
-    });
-  } catch (err) {
-  if (err.code === 11000) {
-    err.statusCode = 409;
-    err.message = 'El email ya está registrado.';
-  } else if (err.name === 'ValidationError') {
-    err.statusCode = 400;
-    err.message = 'Datos de usuario inválidos.';
+    const user = await User.findById(req.params.userId)
+      .orFail(() => {
+        const error = new Error('Usuario no encontrado');
+        error.statusCode = 404;
+        throw error;
+      });
+    return res.status(200).json(user);
+  } catch (error) {
+    if (error.statusCode === 404) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'ID de usuario inválido' });
+    }
+    return res.status(500).json({ message: 'Error del servidor' });
   }
-  return next(err);
 }
-};
 
-const jwt = require('jsonwebtoken');
-const { NODE_ENV, JWT_SECRET } = process.env;
-
-module.exports.login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    // Trae el usuario e incluye password por si luego lo ocultamos con select:false (Punto 10)
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return res.status(401).send({ message: 'Email o contraseña incorrectos.' });
-    }
-
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) {
-      return res.status(401).send({ message: 'Email o contraseña incorrectos.' });
-    }
-
-    const token = jwt.sign(
-      { _id: user._id },
-      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-      { expiresIn: '7d' }
-    );
-
-    return res.send({ token }); // Enviar token en el cuerpo de la respuesta
-  } catch (err) {
-  return next(err);
-}
-};
 module.exports.getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
@@ -72,5 +28,29 @@ module.exports.getCurrentUser = async (req, res, next) => {
     return res.send(user);
   } catch (err) {
     return next ? next(err) : res.status(500).send({ message: 'Error del servidor.' });
+  }
+};
+
+module.exports.updateUser = async (req, res) => {
+  try {
+    const { name, about } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true, runValidators: true },
+    ).orFail(() => {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
+      throw error;
+    });
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    if (error.name === 'validationError') {
+      return res.status(400).json({ message: 'Datos invalidados para actualizar' });
+    }
+    if (error.statusCode === 404) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    return res.status(500).json({ message: 'Error del servidor' });
   }
 };

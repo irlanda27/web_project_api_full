@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const auth = require('./middlewares/auth');
-const { createUser, login, getCurrentUser } = require('./controllers/users');
+const usersController = require('./controllers/users');
 const { validateSignup, validateSignin } = require('./utils/validators');
 const errorHandler = require('./middlewares/error');
 const {errors} = require('celebrate');
@@ -9,21 +9,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cors = require('cors');
+const usersRouter = require('./routes/users');
+const cardsRouter = require('./routes/cards');
+const authRouter = require('./routes/auth');
+
 
 app.use(express.json());
 app.use(requestLogger);
 app.use(cors());
-app.options('*', cors());
 
-// Rutas públicas con validación
-app.post('/signup', validateSignup, createUser);
-app.post('/signin', validateSignin, login);
+
 
 // Middleware de autorización
 app.use(auth);
-
-// Rutas protegidas
-app.get('/users/me', getCurrentUser);
+app.use('/users', usersRouter);
+/*app.use(cardsRouter);*/
+app.use('/', authRouter);
 
 // Conexión a Mongo
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/aroundb19';
@@ -41,7 +42,7 @@ mongoose.connect(MONGO_URI)
 
 
 app.use(errorLogger);
-app.use(errors());
+/*app.use(errors());*/
 
 
 // Middleware de errores centralizado
