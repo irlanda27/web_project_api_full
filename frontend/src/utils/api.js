@@ -119,7 +119,7 @@ class Api {
 }
 
 const apiInstance = new Api({
-  baseUrl: "https://around-api.es.tripleten-services.com/v1",
+  baseUrl: "http://localhost:3000",
   headers: {
     authorization: "53f3933b-4210-4c65-8e4b-9438424c1772",
     "Content-Type": "application/json",

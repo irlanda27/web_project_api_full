@@ -16,24 +16,49 @@ const authRouter = require('./routes/auth');
 
 app.use(express.json());
 app.use(requestLogger);
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',    
+  'http://127.0.0.1:3003',   
+];
 
+app.use((req, res, next) => {
+  const { origin } = req.headers
+  console.log(origin,)
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE',
+  )
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  )
 
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200).end()
+    return
+  }
 
+  next()
+})
+
+app.use('/', authRouter);
 // Middleware de autorización
 app.use(auth);
 app.use('/users', usersRouter);
-/*app.use(cardsRouter);*/
-app.use('/', authRouter);
+
 
 // Conexión a Mongo
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/aroundb19';
+const MONGO_URI = 'mongodb://127.0.0.1:27017/aroundb19';
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB conectado');
-    app.listen(PORT, () => {
-      console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-    });
+    
   })
   .catch((err) => {
     console.error('❌ Error conectando a MongoDB:', err.message);
@@ -47,3 +72,6 @@ app.use(errorLogger);
 
 // Middleware de errores centralizado
 app.use(errorHandler);
+app.listen(PORT, () => {
+      console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+    });
