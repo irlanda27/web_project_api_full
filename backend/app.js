@@ -9,6 +9,11 @@ const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const authRouter = require("./routes/auth");
 
+
+// inclúyelos antes de otras rutas
+app.use(cors());
+
+
 app.use(express.json());
 app.use(cors());
 
