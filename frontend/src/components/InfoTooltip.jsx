@@ -1,6 +1,6 @@
 
 import checkIcon from "../images/check.png";
-import errorIcon from "../images/ex.png";
+/*import errorIcon from "../images/ex.png";*/
 
 function InfoTooltip({ isOpen, onClose, isSuccess }) {
   if (!isOpen) return null;
@@ -11,7 +11,7 @@ function InfoTooltip({ isOpen, onClose, isSuccess }) {
         <button className="popup__close-window" onClick={onClose}>✖</button>
 
         <img
-          src={isSuccess ? checkIcon : errorIcon}
+          src={isSuccess ? checkIcon : checkIcon}
           alt={isSuccess ? "Éxito" : "Error"}
           className="popup__icon"
         />
