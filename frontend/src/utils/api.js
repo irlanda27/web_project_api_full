@@ -93,7 +93,7 @@ class Api {
 }
 
 // Usa variable de entorno de Vite si existe
-const BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = import.meta.env?.VITE_API_BASE_URL ||    'https://api.irlanda.chickenkiller.com';
 
 const apiInstance = new Api({ baseUrl: BASE_URL });
 

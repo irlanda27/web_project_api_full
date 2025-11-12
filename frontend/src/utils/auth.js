@@ -3,7 +3,7 @@
 // Usa la URL del .env de Vite si existe; si no, localhost
 export const BASE_URL =
   (import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
-  'http://localhost:3000';
+   'https://api.irlanda.chickenkiller.com'
 
 // Helpers de token
 export const getToken = () => localStorage.getItem('jwt') || '';
@@ -14,7 +14,7 @@ export const logout = () => localStorage.removeItem('jwt');
 const handle = async (res) => {
   const text = await res.text();
   let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+  try { data = text ? JSON.parse(text) : {}; } catch (error) {console.log('Error parsing JSON:', error);}
   if (!res.ok) {
     const err = new Error(data.message || `HTTP ${res.status}`);
     err.status = res.status;

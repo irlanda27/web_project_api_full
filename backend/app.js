@@ -8,14 +8,41 @@ const cors = require("cors");
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const authRouter = require("./routes/auth");
+const allowedOrigins = [
+  'https://api.irlanda.chickenkiller.com',
+  'https://irlanda.chickenkiller.com',
+  'www.irlanda.chickenkiller.com', 
+  'http://localhost:3000/',
+
+]
+
+app.use((req, res, next) => {
+  const { origin } = req.headers
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE',
+  )
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  )
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200).end()
+    return
+  }
+
+  next()
+})
 
 
-// inclúyelos antes de otras rutas
-app.use(cors());
 
 
 app.use(express.json());
-app.use(cors());
+
 
 app.use(requestLogger);
 app.use("/", authRouter);
