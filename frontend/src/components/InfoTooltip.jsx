@@ -1,4 +1,4 @@
-import React from "react";
+
 import checkIcon from "../images/check.png";
 import errorIcon from "../images/ex.png";
 
