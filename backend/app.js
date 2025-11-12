@@ -13,7 +13,8 @@ const allowedOrigins = [
   'https://irlanda.chickenkiller.com',
   'www.irlanda.chickenkiller.com', 
   'http://localhost:3000/',
-
+  'http://irlanda.chickenkiller.com',
+'http://api.irlanda.chickenkiller.com',
 ]
 
 app.use((req, res, next) => {
