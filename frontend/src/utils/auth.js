@@ -3,7 +3,7 @@
 // Usa la URL del .env de Vite si existe; si no, localhost
 export const BASE_URL =
   (import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
-   'http://api.irlanda.chickenkiller.com'
+   'https://api.irlanda.chickenkiller.com'
 
 // Helpers de token
 export const getToken = () => localStorage.getItem('jwt') || '';
