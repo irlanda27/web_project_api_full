@@ -1,8 +1,7 @@
 import { useState } from "react";
 import trashIcon from "../../../../images/trash_icon.png";
-import cardImage from "../../../../images/valle de yosemite.jpg";
 import likeButton from "../../../../images/Vector_corazon.svg";
-import likeButtonActive from "../../../../images/Union.png";
+import likeButtonActive from "../../../../images/corazon_like.png";
 
 export default function Card(props) {
   const { name, link, isLiked } = props.card;
